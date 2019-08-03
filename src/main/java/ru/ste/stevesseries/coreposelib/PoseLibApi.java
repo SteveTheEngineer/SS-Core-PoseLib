@@ -69,9 +69,45 @@ public interface PoseLibApi {
    *
    * @param player the player of which you want to set the pose
    * @param poseClass new pose's class
+   * @param duration how long player will need to wait until starting to press shift (in ticks), use
+   *     0 to remove duration
+   * @param shifts amount of times player need to press in order to stand up, use 0 to remove
+   *     ability to stand up
    * @throws IllegalArgumentException if the pose is unknown
    */
-  void setPose(Player player, Class<? extends Pose> poseClass);
+  void setPose(Player player, Class<? extends Pose> poseClass, long duration, int shifts);
+
+  /**
+   * Gets amount of times player need to press shift in order to stand up left
+   *
+   * @param player the player of which you want to get the data
+   * @return optional of integer if present, empty optional if none
+   */
+  Optional<Integer> getShiftsLeft(Player player);
+
+  /**
+   * Sets a new amount of times player need to press shift in order to stand up left
+   *
+   * @param player the player of which you want to get the data
+   * @param newShifts the new shifts
+   */
+  void setShiftsLeft(Player player, int newShifts);
+
+  /**
+   * Gets player pose duration
+   *
+   * @param player the player of which you want to get the pose duration
+   * @return optional of long if present, empty optional if none
+   */
+  Optional<Long> getPoseDuration(Player player);
+
+  /**
+   * Sets a new player pose duration
+   *
+   * @param player player, whose duration you want to set
+   * @param playerPoseDuration new duration
+   */
+  void setPoseDuration(Player player, long playerPoseDuration);
 
   /**
    * Returns a raw, unmodifiable copy of all posed players with their positions

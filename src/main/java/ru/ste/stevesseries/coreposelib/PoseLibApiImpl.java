@@ -32,6 +32,8 @@ import org.bukkit.entity.Player;
 public class PoseLibApiImpl implements PoseLibApi {
 
   private Map<UUID, Pose> posesMap = new ConcurrentHashMap<>();
+  private Map<UUID, Long> duration = new ConcurrentHashMap<>();
+  private Map<UUID, Integer> shiftsLeft = new ConcurrentHashMap<>();
   private Map<Class<? extends Pose>, Pose> knownPoses = new ConcurrentHashMap<>();
 
   @Override
@@ -67,7 +69,7 @@ public class PoseLibApiImpl implements PoseLibApi {
   }
 
   @Override
-  public void setPose(Player player, Class<? extends Pose> poseClass) {
+  public void setPose(Player player, Class<? extends Pose> poseClass, long durations, int shifts) {
     Optional<Pose> poseOptional = getPose(player);
     if (poseOptional.isPresent()) {
       posesMap.remove(player.getUniqueId());
@@ -76,6 +78,16 @@ public class PoseLibApiImpl implements PoseLibApi {
         return;
       }
     }
+    if(durations > 0) {
+      duration.put(player.getUniqueId(), durations);
+    } else {
+      duration.put(player.getUniqueId(), 0L);
+    }
+    if(shifts > 0) {
+      shiftsLeft.put(player.getUniqueId(), shifts);
+    } else {
+      shiftsLeft.put(player.getUniqueId(), 0);
+    }
     Pose toSet = knownPoses.get(poseClass);
     Preconditions.checkNotNull(toSet, "New position not registered");
     toSet.transform(player);
@@ -83,6 +95,34 @@ public class PoseLibApiImpl implements PoseLibApi {
       toSet.showFor(all, player);
     }
     posesMap.put(player.getUniqueId(), toSet);
+  }
+
+  @Override
+  public Optional<Integer> getShiftsLeft(Player player) {
+    return Optional.ofNullable(shiftsLeft.get(player.getUniqueId()));
+  }
+
+  @Override
+  public void setShiftsLeft(Player player, int newShifts) {
+    if (!getPose(player).isPresent()) {
+      return;
+    }
+    shiftsLeft.remove(player.getUniqueId());
+    shiftsLeft.put(player.getUniqueId(), newShifts);
+  }
+
+  @Override
+  public Optional<Long> getPoseDuration(Player player) {
+    return Optional.ofNullable(duration.get(player.getUniqueId()));
+  }
+
+  @Override
+  public void setPoseDuration(Player player, long playerPoseDuration) {
+    if (!getPose(player).isPresent()) {
+      return;
+    }
+    duration.remove(player.getUniqueId());
+    duration.put(player.getUniqueId(), playerPoseDuration);
   }
 
   @Override

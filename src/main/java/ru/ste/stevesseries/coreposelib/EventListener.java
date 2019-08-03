@@ -2,7 +2,6 @@ package ru.ste.stevesseries.coreposelib;
 
 import java.util.Map;
 import java.util.UUID;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -31,9 +30,11 @@ import org.spigotmc.event.entity.EntityDismountEvent;
 public class EventListener implements Listener {
 
     private SSCorePoseLib plugin;
+    private PoseLibApi api;
 
     public EventListener(SSCorePoseLib plugin) {
         this.plugin = plugin;
+        api = plugin.getApi();
     }
 
     @EventHandler
@@ -51,18 +52,18 @@ public class EventListener implements Listener {
     }
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
-        plugin.getApi().resetPose(e.getEntity());
+        api.resetPose(e.getEntity());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        plugin.getApi().resetPose(e.getPlayer());
+        api.resetPose(e.getPlayer());
     }
 
     @EventHandler
     public void onInteractAtEntity(PlayerInteractAtEntityEvent e) {
         UUID rightClickedPassenger = e.getRightClicked().getPassengers().get(0).getUniqueId();
-        Map<UUID, Pose> rawPoses = plugin.getApi().getPosedPlayers();
+        Map<UUID, Pose> rawPoses = api.getPosedPlayers();
         if(e.getRightClicked().getPassengers().size() > 0 && rawPoses.containsKey(rightClickedPassenger) && rawPoses.get(rightClickedPassenger) instanceof Sitting) {
             e.setCancelled(true);
         }
@@ -70,24 +71,24 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onEntityExit(EntityDismountEvent e) {
-        if(plugin.getApi().getPosedPlayers().containsKey(e.getEntity().getUniqueId()) && plugin.getApi().getPosedPlayers().get(e.getEntity().getUniqueId()) instanceof Sitting) {
+        if(api.getPosedPlayers().containsKey(e.getEntity().getUniqueId()) && api.getPosedPlayers().get(e.getEntity().getUniqueId()) instanceof Sitting) {
             e.setCancelled(true);
         }
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            if(PoseManager.getPose(p).isPresent()) {
-                if(PoseManager.getShiftsLeft(p) > 0 && PoseManager.getPoseDuration(p) <= 0) {
-                    PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(p, PoseManager.getPose(p).get(), PoseManager.getShiftsLeft(p));
-                    Bukkit.getPluginManager().callEvent(ec);
+            if(api.getPose(p).isPresent()) {
+                if(api.getShiftsLeft(p).get() > 0 && api.getPoseDuration(p).get() <= 0) {
+                    PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(p, api.getPose(p).get(), api.getShiftsLeft(p).get());
+                    plugin.getServer().getPluginManager().callEvent(ec);
                     if(!ec.isCancelled()) {
-                        if(PoseManager.getShiftsLeft(p) == 1) {
-                            PlayerShiftStandupProgressEvent ec2 = new PlayerShiftStandupProgressEvent(p, PoseManager.getPose(p).get(), 0);
-                            Bukkit.getPluginManager().callEvent(ec);
+                        if(api.getShiftsLeft(p).get() == 1) {
+                            PlayerShiftStandupProgressEvent ec2 = new PlayerShiftStandupProgressEvent(p, api.getPose(p).get(), 0);
+                            plugin.getServer().getPluginManager().callEvent(ec);
                             if(!ec2.isCancelled()) {
-                                PoseManager.unsetPose(p);
+                                api.resetPose(p);
                             }
-                        } else if(PoseManager.getShiftsLeft(p) > 1) {
-                            PoseManager.setShiftsLeft(p, PoseManager.getShiftsLeft(p) - 1);
+                        } else if(api.getShiftsLeft(p).get() > 1) {
+                            api.setShiftsLeft(p, api.getShiftsLeft(p).get() - 1);
                         }
                     }
                 }
@@ -103,7 +104,7 @@ public class EventListener implements Listener {
             }
             else {
                 if(e.getFrom().getYaw() != e.getTo().getYaw()) {
-                    Bukkit.getOnlinePlayers().forEach(op -> plugin.getApi().getPose(Laying.class).get().setRotation(e.getPlayer(), op, e.getTo().getYaw()));
+                    plugin.getServer().getOnlinePlayers().forEach(op -> plugin.getApi().getPose(Laying.class).get().setRotation(e.getPlayer(), op, e.getTo().getYaw()));
                 }
                 if(e.getFrom().getPitch() != e.getTo().getPitch()) {
                     if(e.getTo().getPitch() > 0) {
@@ -137,7 +138,7 @@ public class EventListener implements Listener {
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
             if(plugin.getApi().getPosedPlayers().containsKey(p.getUniqueId()) && plugin.getApi().getPosedPlayers().get(p.getUniqueId()) instanceof Laying) {
-                Bukkit.getOnlinePlayers().forEach(op -> plugin.getApi().getPose(Laying.class).get().animationDamage(p, op));
+                plugin.getServer().getOnlinePlayers().forEach(op -> plugin.getApi().getPose(Laying.class).get().animationDamage(p, op));
             }
         }
     }
@@ -187,18 +188,19 @@ public class EventListener implements Listener {
     @EventHandler
     public void onToggleSneak(PlayerToggleSneakEvent e) {
         if(e.isSneaking()) {
-            if(PoseManager.getPose(e.getPlayer()).isPresent()) {
-                if(PoseManager.getShiftsLeft(e.getPlayer()) > 0 && PoseManager.getPoseDuration(e.getPlayer()) <= 0) {
-                    PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(e.getPlayer(), PoseManager.getPose(e.getPlayer()).get(), PoseManager.getShiftsLeft(e.getPlayer()));
-                    Bukkit.getPluginManager().callEvent(ec);
+            if(api.getPose(e.getPlayer()).isPresent()) {
+                if(api.getShiftsLeft(e.getPlayer()).get() > 0 && api.getPoseDuration(e.getPlayer()).get() <= 0) {
+                    PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(e.getPlayer(), api.getPose(e.getPlayer()).get(), api.getShiftsLeft(e.getPlayer()).get());
+                    plugin.getServer().getPluginManager().callEvent(ec);
                     if(!ec.isCancelled()) {
-                        if(PoseManager.getShiftsLeft(e.getPlayer()) == 1) {
-                            PlayerShiftStandupProgressEvent ec2 = new PlayerShiftStandupProgressEvent(e.getPlayer(), PoseManager.getPose(e.getPlayer()).get(), 0);
-                            Bukkit.getPluginManager().callEvent(ec);
-                            if(!ec2.isCancelled()) PoseManager.unsetPose(e.getPlayer());
-                        }
-                        else if(PoseManager.getShiftsLeft(e.getPlayer()) > 1) {
-                            PoseManager.setShiftsLeft(e.getPlayer(), PoseManager.getShiftsLeft(e.getPlayer()) - 1);
+                        if(api.getShiftsLeft(e.getPlayer()).get() == 1) {
+                            PlayerShiftStandupProgressEvent ec2 = new PlayerShiftStandupProgressEvent(e.getPlayer(), api.getPose(e.getPlayer()).get(), 0);
+                            plugin.getServer().getPluginManager().callEvent(ec);
+                            if(!ec2.isCancelled()) {
+                                api.resetPose(e.getPlayer());
+                            }
+                        } else if(api.getShiftsLeft(e.getPlayer()).get() > 1) {
+                            api.setShiftsLeft(e.getPlayer(), api.getShiftsLeft(e.getPlayer()).get() - 1);
                         }
                     }
                 }
