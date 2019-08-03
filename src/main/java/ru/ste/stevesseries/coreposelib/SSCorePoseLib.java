@@ -1,6 +1,5 @@
 package ru.ste.stevesseries.coreposelib;
 
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,16 +24,6 @@ public final class SSCorePoseLib extends JavaPlugin {
     @Override
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);
-    }
-
-    @Deprecated
-    public static Pose getPose(Player p) {
-        return poseLibApi.getPose(p).get();
-    }
-
-    @Deprecated
-    public static void setPose(Player p, Pose pose) {
-        poseLibApi.setPose(p, pose.getClass());
     }
 
     public PoseLibApi getApi() {
