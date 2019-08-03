@@ -59,6 +59,9 @@ public class PoseLibApiImpl implements PoseLibApi {
     if (poseOptional.isPresent()) {
       Pose pose = poseOptional.get();
       pose.normalize(player);
+      for (Player all : Bukkit.getOnlinePlayers()) {
+        pose.hideFor(all, player);
+      }
       posesMap.remove(player.getUniqueId());
     }
   }
