@@ -3,8 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SS-Core-PoseLib.iml" filepath="$PROJECT_DIR$/SS-Core-PoseLib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SS-Core-PoseLib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SS-Core-PoseLib.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SS-Core-PoseLib.test.iml" filepath="$PROJECT_DIR$/.idea/modules/SS-Core-PoseLib.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ss-core-poselib.iml" filepath="$PROJECT_DIR$/.idea/modules/ss-core-poselib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ss-core-poselib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ss-core-poselib.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ss-core-poselib.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ss-core-poselib.test.iml" />
     </modules>
   </component>
 </project>

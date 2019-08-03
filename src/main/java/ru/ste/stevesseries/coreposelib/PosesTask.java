@@ -10,9 +10,16 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public class PosesTask implements Runnable {
+
+    private SSCorePoseLib plugin;
+
+    public PosesTask(SSCorePoseLib plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public void run() {
-        SSCorePoseLib.LAYING.POSED.forEach((u, d) -> {
+        plugin.getApi().getPose(Laying.class).get().POSED.forEach((u, d) -> {
             Player p = Bukkit.getPlayer(u);
             p.removePotionEffect(PotionEffectType.INVISIBILITY);
             p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20, 0, false, false, false));
@@ -24,14 +31,13 @@ public class PosesTask implements Runnable {
                 if(PoseManager.getShiftsLeft(p) > 0) {
                     PoseManager.setShiftsLeft(p, PoseManager.getShiftsLeft(p) + 1);
                 }
-                SSCorePoseLib.setPose(p, null);
+                plugin.getApi().resetPose(p);
                 p.teleport(p.getLocation().getBlock().getRelative(d.bf.getOppositeFace()).getLocation().subtract(0, 1, 0));
-                SSCorePoseLib.setPose(p, SSCorePoseLib.LAYING);
+                plugin.getApi().setPose(p, Laying.class);
             }
         });
-        SSCorePoseLib.SITTING.ARMORSTANDS.forEach((pu, au) -> {
+        plugin.getApi().getPose(Sitting.class).get().ARMORSTANDS.forEach((pu, au) -> {
             Player p = Bukkit.getPlayer(pu);
-            ArmorStand a = (ArmorStand) Bukkit.getEntity(au);
             String matName = p.getLocation().getBlock().getType().name();
             if(matName.endsWith("AIR") || matName.equals("WATER")) {
                 int fd = 4 * PoseManager.getShiftsLeft(p);

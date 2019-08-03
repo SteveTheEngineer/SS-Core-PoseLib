@@ -1,18 +1,25 @@
 package ru.ste.stevesseries.coreposelib;
 
+import java.util.Optional;
 import org.bukkit.Bukkit;
 
 public class UpdaterTask implements Runnable {
+
+    private SSCorePoseLib plugin;
+
+    public UpdaterTask(SSCorePoseLib plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public void run() {
-        Bukkit.getOnlinePlayers().forEach(p -> {
-            Bukkit.getOnlinePlayers().forEach(p2 -> {
-                Pose po = SSCorePoseLib.getPose(p2);
-                if(po != null) {
-                    po.unrenderFor(p, p2);
-                    po.renderFor(p, p2);
-                }
-            });
-        });
+        Bukkit.getOnlinePlayers().forEach(p -> Bukkit.getOnlinePlayers().forEach(p2 -> {
+            Optional<Pose> poseOptional = plugin.getApi().getPose(p2);
+            if(poseOptional.isPresent()) {
+                Pose pose = poseOptional.get();
+                pose.hideFor(p, p2);
+                pose.showFor(p, p2);
+            }
+        }));
     }
 }

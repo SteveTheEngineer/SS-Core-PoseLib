@@ -1,74 +1,92 @@
 package ru.ste.stevesseries.coreposelib;
 
+import java.util.Map;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.spigotmc.event.entity.EntityDismountEvent;
 
 public class EventListener implements Listener {
+
+    private SSCorePoseLib plugin;
+
+    public EventListener(SSCorePoseLib plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        SSCorePoseLib.poses.forEach((u, p) -> {
-            Player pp = Bukkit.getPlayer(u);
+        plugin.getApi().getPosedPlayers().forEach((u, p) -> {
+            Player pp = plugin.getServer().getPlayer(u);
             if(pp != null) {
-                p.renderFor(e.getPlayer(), pp);
+                p.showFor(e.getPlayer(), pp);
             }
         });
     }
     @EventHandler
     public void onWeatherChange(WeatherChangeEvent e) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(SSCorePoseLib.I, () -> {
-            Bukkit.getOnlinePlayers().forEach(p -> {
-                Bukkit.getOnlinePlayers().forEach(p2 -> {
-                    Pose po = SSCorePoseLib.getPose(p2);
-                    if(po != null) {
-                        po.unrenderFor(p, p2);
-                        po.renderFor(p, p2);
-                    }
-                });
-            });
-        });
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getUpdaterTask().run());
     }
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
-        SSCorePoseLib.setPose(e.getEntity(), null);
+        plugin.getApi().resetPose(e.getEntity());
     }
+
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
-        SSCorePoseLib.setPose(e.getPlayer(), null);
+        plugin.getApi().resetPose(e.getPlayer());
     }
+
     @EventHandler
     public void onInteractAtEntity(PlayerInteractAtEntityEvent e) {
-        if(e.getRightClicked().getPassengers().size() > 0 && SSCorePoseLib.poses.containsKey(e.getRightClicked().getPassengers().get(0).getUniqueId()) && SSCorePoseLib.poses.get(e.getRightClicked().getPassengers().get(0).getUniqueId()) instanceof Sitting) {
+        UUID rightClickedPassenger = e.getRightClicked().getPassengers().get(0).getUniqueId();
+        Map<UUID, Pose> rawPoses = plugin.getApi().getPosedPlayers();
+        if(e.getRightClicked().getPassengers().size() > 0 && rawPoses.containsKey(rightClickedPassenger) && rawPoses.get(rightClickedPassenger) instanceof Sitting) {
             e.setCancelled(true);
         }
     }
+
     @EventHandler
     public void onEntityExit(EntityDismountEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getEntity().getUniqueId()) && SSCorePoseLib.poses.get(e.getEntity().getUniqueId()) instanceof Sitting) {
+        if(plugin.getApi().getPosedPlayers().containsKey(e.getEntity().getUniqueId()) && plugin.getApi().getPosedPlayers().get(e.getEntity().getUniqueId()) instanceof Sitting) {
             e.setCancelled(true);
         }
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            if(PoseManager.getPose(p) != null) {
+            if(PoseManager.getPose(p).isPresent()) {
                 if(PoseManager.getShiftsLeft(p) > 0 && PoseManager.getPoseDuration(p) <= 0) {
-                    PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(p, PoseManager.getPose(p), PoseManager.getShiftsLeft(p));
+                    PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(p, PoseManager.getPose(p).get(), PoseManager.getShiftsLeft(p));
                     Bukkit.getPluginManager().callEvent(ec);
                     if(!ec.isCancelled()) {
                         if(PoseManager.getShiftsLeft(p) == 1) {
-                            PlayerShiftStandupProgressEvent ec2 = new PlayerShiftStandupProgressEvent(p, PoseManager.getPose(p), 0);
+                            PlayerShiftStandupProgressEvent ec2 = new PlayerShiftStandupProgressEvent(p, PoseManager.getPose(p).get(), 0);
                             Bukkit.getPluginManager().callEvent(ec);
-                            if(!ec2.isCancelled()) PoseManager.unsetPose(p);
-                        }
-                        else if(PoseManager.getShiftsLeft(p) > 1) {
+                            if(!ec2.isCancelled()) {
+                                PoseManager.unsetPose(p);
+                            }
+                        } else if(PoseManager.getShiftsLeft(p) > 1) {
                             PoseManager.setShiftsLeft(p, PoseManager.getShiftsLeft(p) - 1);
                         }
                     }
@@ -76,17 +94,16 @@ public class EventListener implements Listener {
             }
         }
     }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
+        if(plugin.getApi().getPosedPlayers().containsKey(e.getPlayer().getUniqueId()) && plugin.getApi().getPosedPlayers().get(e.getPlayer().getUniqueId()) instanceof Laying) {
             if(e.getFrom().getX() != e.getTo().getX() || e.getFrom().getY() != e.getTo().getY() || e.getFrom().getZ() != e.getTo().getZ()) {
                 e.setCancelled(true);
             }
             else {
                 if(e.getFrom().getYaw() != e.getTo().getYaw()) {
-                    Bukkit.getOnlinePlayers().forEach(op -> {
-                        SSCorePoseLib.LAYING.setRotation(e.getPlayer(), op, e.getTo().getYaw());
-                    });
+                    Bukkit.getOnlinePlayers().forEach(op -> plugin.getApi().getPose(Laying.class).get().setRotation(e.getPlayer(), op, e.getTo().getYaw()));
                 }
                 if(e.getFrom().getPitch() != e.getTo().getPitch()) {
                     if(e.getTo().getPitch() > 0) {
@@ -99,94 +116,84 @@ public class EventListener implements Listener {
     }
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check(e.getPlayer(), e);
     }
+
     @EventHandler
     public void onBlockDamage(BlockDamageEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check(e.getPlayer(), e);
     }
+
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
         if(e.getDamager() instanceof Player) {
             Player p = (Player) e.getDamager();
-            if(SSCorePoseLib.poses.containsKey(p.getUniqueId()) && SSCorePoseLib.poses.get(p.getUniqueId()) instanceof Laying) {
-                e.setCancelled(true);
-            }
+            check(p, e);
         }
     }
+
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent e) {
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            if(SSCorePoseLib.poses.containsKey(p.getUniqueId()) && SSCorePoseLib.poses.get(p.getUniqueId()) instanceof Laying) {
-                Bukkit.getOnlinePlayers().forEach(op -> {
-                    SSCorePoseLib.LAYING.animationDamage(p, op);
-                });
+            if(plugin.getApi().getPosedPlayers().containsKey(p.getUniqueId()) && plugin.getApi().getPosedPlayers().get(p.getUniqueId()) instanceof Laying) {
+                Bukkit.getOnlinePlayers().forEach(op -> plugin.getApi().getPose(Laying.class).get().animationDamage(p, op));
             }
         }
     }
+
     @EventHandler
     public void onToggleFlight(PlayerToggleFlightEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check(e.getPlayer(), e);
     }
+
     @EventHandler
     public void onDropItem(PlayerDropItemEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check(e.getPlayer(), e);
     }
+
     @EventHandler
-    public void onPickupItem(PlayerPickupItemEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
+    public void onPickupItem(EntityPickupItemEvent e) {
+        if (e.getEntity() instanceof Player) {
+            check((Player) e.getEntity(), e);
         }
     }
+
     @EventHandler
     public void onPickupArrow(PlayerPickupArrowEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check(e.getPlayer(), e);
     }
+
     @EventHandler
     public void onSwapHands(PlayerSwapHandItemsEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check(e.getPlayer(), e);
     }
+
     @EventHandler
     public void onItemHeld(PlayerItemHeldEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check(e.getPlayer(), e);
     }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getWhoClicked().getUniqueId()) && SSCorePoseLib.poses.get(e.getWhoClicked().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check((Player) e.getWhoClicked(), e);
     }
+
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
-        if(SSCorePoseLib.poses.containsKey(e.getPlayer().getUniqueId()) && SSCorePoseLib.poses.get(e.getPlayer().getUniqueId()) instanceof Laying) {
-            e.setCancelled(true);
-        }
+        check(e.getPlayer(), e);
     }
+
     @EventHandler
     public void onToggleSneak(PlayerToggleSneakEvent e) {
         if(e.isSneaking()) {
-            if(PoseManager.getPose(e.getPlayer()) != null) {
+            if(PoseManager.getPose(e.getPlayer()).isPresent()) {
                 if(PoseManager.getShiftsLeft(e.getPlayer()) > 0 && PoseManager.getPoseDuration(e.getPlayer()) <= 0) {
-                    PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(e.getPlayer(), PoseManager.getPose(e.getPlayer()), PoseManager.getShiftsLeft(e.getPlayer()));
+                    PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(e.getPlayer(), PoseManager.getPose(e.getPlayer()).get(), PoseManager.getShiftsLeft(e.getPlayer()));
                     Bukkit.getPluginManager().callEvent(ec);
                     if(!ec.isCancelled()) {
                         if(PoseManager.getShiftsLeft(e.getPlayer()) == 1) {
-                            PlayerShiftStandupProgressEvent ec2 = new PlayerShiftStandupProgressEvent(e.getPlayer(), PoseManager.getPose(e.getPlayer()), 0);
+                            PlayerShiftStandupProgressEvent ec2 = new PlayerShiftStandupProgressEvent(e.getPlayer(), PoseManager.getPose(e.getPlayer()).get(), 0);
                             Bukkit.getPluginManager().callEvent(ec);
                             if(!ec2.isCancelled()) PoseManager.unsetPose(e.getPlayer());
                         }
@@ -196,6 +203,12 @@ public class EventListener implements Listener {
                     }
                 }
             }
+        }
+    }
+
+    private void check(Player player, Cancellable event) {
+        if(plugin.getApi().getPosedPlayers().containsKey(player.getUniqueId()) && plugin.getApi().getPosedPlayers().get(player.getUniqueId()) instanceof Laying) {
+            event.setCancelled(true);
         }
     }
 }

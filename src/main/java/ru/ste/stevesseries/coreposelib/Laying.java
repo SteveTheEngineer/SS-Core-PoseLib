@@ -16,14 +16,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Laying extends Pose {
-    public static class Data {
+public class Laying implements Pose {
+
+    public static class PlayerData {
         public Object ep;
         public BlockFace bf;
         public Location pos;
         public boolean wf;
         public ItemStack helmet, chestplate, leggings, boots;
-        public Data(Object ep, BlockFace bf, Location pos, boolean wf, ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
+
+        public PlayerData(Object ep, BlockFace bf, Location pos, boolean wf, ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
             this.ep = ep;
             this.bf = bf;
             this.pos = pos;
@@ -35,7 +37,7 @@ public class Laying extends Pose {
         }
     }
 
-    public Map<UUID, Data> POSED;
+    public Map<UUID, PlayerData> POSED;
 
     public Laying() {
         POSED = new HashMap<>();
@@ -59,8 +61,10 @@ public class Laying extends Pose {
     }
 
     @Override
-    public void to(Player p) {
-        if(POSED.containsKey(p.getUniqueId())) return;
+    public void transform(Player p) {
+        if(POSED.containsKey(p.getUniqueId())) {
+            return;
+        }
         Location l = p.getLocation().getBlock().getRelative(getFace(p.getLocation().getYaw()).getOppositeFace()).getLocation().add(0.5, 0, 0.5);
         l.setYaw(p.getLocation().getYaw());
         l.setPitch(p.getLocation().getPitch());
@@ -68,7 +72,7 @@ public class Laying extends Pose {
             Object entityPlayer = NMSUtil.getHandle(p);
             Object entityPlayerA = NMSUtil.getNMSClass("EntityPlayer").getConstructor(NMSUtil.getNMSClass("MinecraftServer"), NMSUtil.getNMSClass("WorldServer"), GameProfile.class, NMSUtil.getNMSClass("PlayerInteractManager")).newInstance(entityPlayer.getClass().getMethod("getMinecraftServer").invoke(entityPlayer), entityPlayer.getClass().getMethod("getWorldServer").invoke(entityPlayer), entityPlayer.getClass().getMethod("getProfile").invoke(entityPlayer), entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer));
             entityPlayerA.getClass().getMethod("setPosition", double.class, double.class, double.class).invoke(entityPlayerA, l.getX(), l.getY(), l.getZ());
-            POSED.put(p.getUniqueId(), new Data(entityPlayerA, getFace(p.getLocation().getYaw()).getOppositeFace(), l, p.getAllowFlight(), Objects.requireNonNull(p.getEquipment()).getHelmet() != null ? Objects.requireNonNull(p.getEquipment()).getHelmet().clone() : null, Objects.requireNonNull(p.getEquipment()).getChestplate() != null ? Objects.requireNonNull(p.getEquipment()).getChestplate().clone() : null, Objects.requireNonNull(p.getEquipment()).getLeggings() != null ? Objects.requireNonNull(p.getEquipment()).getLeggings().clone() : null, Objects.requireNonNull(p.getEquipment()).getBoots() != null ? Objects.requireNonNull(p.getEquipment()).getBoots().clone() : null));
+            POSED.put(p.getUniqueId(), new PlayerData(entityPlayerA, getFace(p.getLocation().getYaw()).getOppositeFace(), l, p.getAllowFlight(), Objects.requireNonNull(p.getEquipment()).getHelmet() != null ? Objects.requireNonNull(p.getEquipment()).getHelmet().clone() : null, Objects.requireNonNull(p.getEquipment()).getChestplate() != null ? Objects.requireNonNull(p.getEquipment()).getChestplate().clone() : null, Objects.requireNonNull(p.getEquipment()).getLeggings() != null ? Objects.requireNonNull(p.getEquipment()).getLeggings().clone() : null, Objects.requireNonNull(p.getEquipment()).getBoots() != null ? Objects.requireNonNull(p.getEquipment()).getBoots().clone() : null));
             if(p.getEquipment().getItemInMainHand().getType() != Material.AIR) {
                 p.getLocation().getWorld().dropItemNaturally(p.getLocation().add(0, 1, 0), p.getEquipment().getItemInMainHand().clone());
                 p.getEquipment().setItemInMainHand(null);
@@ -102,7 +106,7 @@ public class Laying extends Pose {
     }
 
     @Override
-    public void from(Player p) {
+    public void normalize(Player p) {
         if(!POSED.containsKey(p.getUniqueId())) return;
         p.removePotionEffect(PotionEffectType.INVISIBILITY);
         p.setAllowFlight(POSED.get(p.getUniqueId()).wf);
@@ -128,7 +132,7 @@ public class Laying extends Pose {
     }
 
     @Override
-    public void renderFor(Player op, Player p) {
+    public void showFor(Player op, Player p) {
         /*EntityPlayer entityPlayer = POSED.get(p.getUniqueId()).ep;
         BlockFace blockFace = POSED.get(p.getUniqueId()).bf;
         Location l = POSED.get(p.getUniqueId()).pos;
@@ -242,7 +246,7 @@ public class Laying extends Pose {
     }
 
     @Override
-    public void unrenderFor(Player op, Player p) {
+    public void hideFor(Player op, Player p) {
         Object entityPlayer = POSED.get(p.getUniqueId()).ep;
         try {
             NMSUtil.sendPacket(op, NMSUtil.getNMSClass("PacketPlayOutEntityDestroy").getConstructor(int[].class).newInstance((Object) new int[] { (int) entityPlayer.getClass().getMethod("getId").invoke(entityPlayer) }));
@@ -255,7 +259,7 @@ public class Laying extends Pose {
 
     public boolean isThereALayingPlayer(Location l) {
         if(POSED.size() <= 0) return false;
-        for(Data d : POSED.values()) {
+        for(PlayerData d : POSED.values()) {
             if(l.distanceSquared(d.pos) <= 0.5) {
                 return true;
             }

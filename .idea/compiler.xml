@@ -2,8 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="SS-Core-PoseLib.main" target="1.8" />
-      <module name="SS-Core-PoseLib.test" target="1.8" />
+      <module name="ss-core-poselib.main" target="1.8" />
+      <module name="ss-core-poselib.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
