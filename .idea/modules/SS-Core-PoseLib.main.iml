@@ -4,7 +4,7 @@
     <facet type="minecraft" name="Minecraft">
       <configuration>
         <autoDetectTypes>
-          <platformType>PAPER</platformType>
+          <platformType>SPIGOT</platformType>
         </autoDetectTypes>
       </configuration>
     </facet>
@@ -21,7 +21,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/mytestsrv-1142/cache/patched_1.14.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/SS-Core-Base-1.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -30,7 +30,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../SS-Core-Base/build/libs/SS-Core-Base-1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/spigot-1.14.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
