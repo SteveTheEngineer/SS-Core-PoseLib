@@ -1,0 +1,10 @@
+name: SS-Core-PoseLib
+version: @version@
+main: ru.ste.stevesseries.coreposelib.SSCorePoseLib
+api-version: "1.14"
+depend:
+  - SS-Core-Base
+prefix: "SS | Core: PoseLib"
+load: STARTUP
+authors: [STEngineer]
+description: This plugin is providing utilities for setting player pose (lying, upside-down, sitting, etc.) that are compatible between plugins. Needed for some Steve's Series plugins

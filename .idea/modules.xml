@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SS-Core-PoseLib.iml" filepath="$PROJECT_DIR$/SS-Core-PoseLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SS-Core-PoseLib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SS-Core-PoseLib.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SS-Core-PoseLib.test.iml" filepath="$PROJECT_DIR$/.idea/modules/SS-Core-PoseLib.test.iml" />
+    </modules>
+  </component>
+</project>
