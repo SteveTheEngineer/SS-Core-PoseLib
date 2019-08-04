@@ -1,31 +1,15 @@
 package ru.ste.stevesseries.coreposelib;
 
-import java.util.Map;
-import java.util.UUID;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockDamageEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.event.player.PlayerToggleFlightEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.event.weather.WeatherChangeEvent;
-import org.spigotmc.event.entity.EntityDismountEvent;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.*;
+import org.bukkit.event.player.*;
+import org.bukkit.event.weather.*;
+import org.spigotmc.event.entity.*;
+
+import java.util.*;
 
 public class EventListener implements Listener {
 
@@ -46,10 +30,12 @@ public class EventListener implements Listener {
             }
         });
     }
+
     @EventHandler
     public void onWeatherChange(WeatherChangeEvent e) {
         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getUpdaterTask().run());
     }
+
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         api.resetPose(e.getEntity());
@@ -63,7 +49,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void onInteractAtEntity(PlayerInteractAtEntityEvent e) {
         UUID rightClickedPassenger = e.getRightClicked().getPassengers().get(0).getUniqueId();
-        Map<UUID, Pose> rawPoses = api.getPosedPlayers();
+        Map< UUID, Pose > rawPoses = api.getPosedPlayers();
         if(e.getRightClicked().getPassengers().size() > 0 && rawPoses.containsKey(rightClickedPassenger) && rawPoses.get(rightClickedPassenger) instanceof Sitting) {
             e.setCancelled(true);
         }
@@ -75,7 +61,7 @@ public class EventListener implements Listener {
             e.setCancelled(true);
         }
         if(e.getEntity() instanceof Player) {
-            Player p = (Player) e.getEntity();
+            Player p = ( Player ) e.getEntity();
             if(api.getPose(p).isPresent()) {
                 if(api.getShiftsLeft(p).get() > 0 && api.getPoseDuration(p).get() <= 0) {
                     PlayerShiftStandupProgressEvent ec = new PlayerShiftStandupProgressEvent(p, api.getPose(p).get(), api.getShiftsLeft(p).get());
@@ -87,7 +73,8 @@ public class EventListener implements Listener {
                             if(!ec2.isCancelled()) {
                                 api.resetPose(p);
                             }
-                        } else if(api.getShiftsLeft(p).get() > 1) {
+                        }
+                        else if(api.getShiftsLeft(p).get() > 1) {
                             api.setShiftsLeft(p, api.getShiftsLeft(p).get() - 1);
                         }
                     }
@@ -115,76 +102,70 @@ public class EventListener implements Listener {
             }
         }
     }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         check(e.getPlayer(), e);
     }
-
+    private void check(Player player, Cancellable event) {
+        if(plugin.getApi().getPosedPlayers().containsKey(player.getUniqueId()) && plugin.getApi().getPosedPlayers().get(player.getUniqueId()) instanceof Laying) {
+            event.setCancelled(true);
+        }
+    }
     @EventHandler
     public void onBlockDamage(BlockDamageEvent e) {
         check(e.getPlayer(), e);
     }
-
     @EventHandler
     public void onPlayerDamage(EntityDamageByEntityEvent e) {
         if(e.getDamager() instanceof Player) {
-            Player p = (Player) e.getDamager();
+            Player p = ( Player ) e.getDamager();
             check(p, e);
         }
     }
-
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent e) {
         if(e.getEntity() instanceof Player) {
-            Player p = (Player) e.getEntity();
+            Player p = ( Player ) e.getEntity();
             if(plugin.getApi().getPosedPlayers().containsKey(p.getUniqueId()) && plugin.getApi().getPosedPlayers().get(p.getUniqueId()) instanceof Laying) {
                 plugin.getServer().getOnlinePlayers().forEach(op -> plugin.getApi().getPose(Laying.class).get().animationDamage(p, op));
             }
         }
     }
-
     @EventHandler
     public void onToggleFlight(PlayerToggleFlightEvent e) {
         check(e.getPlayer(), e);
     }
-
     @EventHandler
     public void onDropItem(PlayerDropItemEvent e) {
         check(e.getPlayer(), e);
     }
-
     @EventHandler
     public void onPickupItem(EntityPickupItemEvent e) {
-        if (e.getEntity() instanceof Player) {
-            check((Player) e.getEntity(), e);
+        if(e.getEntity() instanceof Player) {
+            check(( Player ) e.getEntity(), e);
         }
     }
-
     @EventHandler
     public void onPickupArrow(PlayerPickupArrowEvent e) {
         check(e.getPlayer(), e);
     }
-
     @EventHandler
     public void onSwapHands(PlayerSwapHandItemsEvent e) {
         check(e.getPlayer(), e);
     }
-
     @EventHandler
     public void onItemHeld(PlayerItemHeldEvent e) {
         check(e.getPlayer(), e);
     }
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        check((Player) e.getWhoClicked(), e);
+        check(( Player ) e.getWhoClicked(), e);
     }
-
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
         check(e.getPlayer(), e);
     }
-
     @EventHandler
     public void onToggleSneak(PlayerToggleSneakEvent e) {
         if(e.isSneaking()) {
@@ -199,18 +180,13 @@ public class EventListener implements Listener {
                             if(!ec2.isCancelled()) {
                                 api.resetPose(e.getPlayer());
                             }
-                        } else if(api.getShiftsLeft(e.getPlayer()).get() > 1) {
+                        }
+                        else if(api.getShiftsLeft(e.getPlayer()).get() > 1) {
                             api.setShiftsLeft(e.getPlayer(), api.getShiftsLeft(e.getPlayer()).get() - 1);
                         }
                     }
                 }
             }
-        }
-    }
-
-    private void check(Player player, Cancellable event) {
-        if(plugin.getApi().getPosedPlayers().containsKey(player.getUniqueId()) && plugin.getApi().getPosedPlayers().get(player.getUniqueId()) instanceof Laying) {
-            event.setCancelled(true);
         }
     }
 }
