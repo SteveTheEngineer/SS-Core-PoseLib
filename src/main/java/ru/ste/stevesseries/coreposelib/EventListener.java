@@ -39,7 +39,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        plugin.getApi().getPosedPlayers().forEach((u, p) -> {
+        api.getPosedPlayers().forEach((u, p) -> {
             Player pp = plugin.getServer().getPlayer(u);
             if(pp != null) {
                 p.showFor(e.getPlayer(), pp);
@@ -98,7 +98,7 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        if(plugin.getApi().getPosedPlayers().containsKey(e.getPlayer().getUniqueId()) && plugin.getApi().getPosedPlayers().get(e.getPlayer().getUniqueId()) instanceof Laying) {
+        if(api.getPosedPlayers().containsKey(e.getPlayer().getUniqueId()) && api.getPosedPlayers().get(e.getPlayer().getUniqueId()) instanceof Laying) {
             if(e.getFrom().getX() != e.getTo().getX() || e.getFrom().getY() != e.getTo().getY() || e.getFrom().getZ() != e.getTo().getZ()) {
                 e.setCancelled(true);
             }
@@ -137,8 +137,8 @@ public class EventListener implements Listener {
     public void onPlayerDamage(EntityDamageEvent e) {
         if(e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            if(plugin.getApi().getPosedPlayers().containsKey(p.getUniqueId()) && plugin.getApi().getPosedPlayers().get(p.getUniqueId()) instanceof Laying) {
-                plugin.getServer().getOnlinePlayers().forEach(op -> plugin.getApi().getPose(Laying.class).get().animationDamage(p, op));
+            if(api.getPosedPlayers().containsKey(p.getUniqueId()) && api.getPosedPlayers().get(p.getUniqueId()) instanceof Laying) {
+                plugin.getServer().getOnlinePlayers().forEach(op -> api.getPose(Laying.class).get().animationDamage(p, op));
             }
         }
     }
