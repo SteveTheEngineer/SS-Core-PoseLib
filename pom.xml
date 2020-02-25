@@ -3,32 +3,4 @@
   <groupId>me.ste.stevesseries</groupId>
   <artifactId>coreposelib</artifactId>
   <version>0</version>
-  
-  <repositories>
-  	<repository>
-  		<id>spigot-repo</id>
-  		<url>https://hub.spigotmc.org/nexus/content/repositories/public/</url>
-  	</repository>
-  	<repository>
-  		<id>sonatype</id>
-  		<url>https://oss.sonatype.org/content/groups/public/</url>
-  	</repository>
-    <repository>
-      <id>generic</id>
-      <url>https://repo.stev.gq/repository/generic/</url>
-    </repository>
-  </repositories>
-  
-  <dependencies>
-  	<dependency>
-  		<groupId>org.spigotmc</groupId>
-  		<artifactId>spigot-api</artifactId>
-  		<version>1.14.4-R0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>me.ste.stevesseries</groupId>
-  		<artifactId>corebase</artifactId>
-  		<version>7</version>
-  	</dependency>
-  </dependencies>
 </project>
