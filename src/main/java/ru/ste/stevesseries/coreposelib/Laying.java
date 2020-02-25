@@ -1,6 +1,5 @@
 package ru.ste.stevesseries.coreposelib;
 
-import com.mojang.authlib.*;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.block.data.type.Bed;
@@ -29,7 +28,7 @@ public class Laying implements Pose {
         l.setPitch(p.getLocation().getPitch());
         try {
             Object entityPlayer = NMSUtil.getHandle(p);
-            Object entityPlayerA = NMSUtil.getNMSClass("EntityPlayer").getConstructor(NMSUtil.getNMSClass("MinecraftServer"), NMSUtil.getNMSClass("WorldServer"), GameProfile.class, NMSUtil.getNMSClass("PlayerInteractManager")).newInstance(entityPlayer.getClass().getMethod("getMinecraftServer").invoke(entityPlayer), entityPlayer.getClass().getMethod("getWorldServer").invoke(entityPlayer), entityPlayer.getClass().getMethod("getProfile").invoke(entityPlayer), entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer));
+            Object entityPlayerA = NMSUtil.getNMSClass("EntityPlayer").getConstructor(NMSUtil.getNMSClass("MinecraftServer"), NMSUtil.getNMSClass("WorldServer"), Class.forName("com.mojang.authlib.GameProfile"), NMSUtil.getNMSClass("PlayerInteractManager")).newInstance(entityPlayer.getClass().getMethod("getMinecraftServer").invoke(entityPlayer), entityPlayer.getClass().getMethod("getWorldServer").invoke(entityPlayer), entityPlayer.getClass().getMethod("getProfile").invoke(entityPlayer), entityPlayer.getClass().getField("playerInteractManager").get(entityPlayer));
             entityPlayerA.getClass().getMethod("setPosition", double.class, double.class, double.class).invoke(entityPlayerA, l.getX(), l.getY(), l.getZ());
             POSED.put(p.getUniqueId(), new PlayerData(entityPlayerA, getFace(p.getLocation().getYaw()).getOppositeFace(), l, p.getAllowFlight(), Objects.requireNonNull(p.getEquipment()).getHelmet() != null ? Objects.requireNonNull(p.getEquipment()).getHelmet().clone() : null, Objects.requireNonNull(p.getEquipment()).getChestplate() != null ? Objects.requireNonNull(p.getEquipment()).getChestplate().clone() : null, Objects.requireNonNull(p.getEquipment()).getLeggings() != null ? Objects.requireNonNull(p.getEquipment()).getLeggings().clone() : null, Objects.requireNonNull(p.getEquipment()).getBoots() != null ? Objects.requireNonNull(p.getEquipment()).getBoots().clone() : null));
             if(p.getEquipment().getItemInMainHand().getType() != Material.AIR) {

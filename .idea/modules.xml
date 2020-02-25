@@ -9,6 +9,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ss-core-poselib.iml" filepath="$PROJECT_DIR$/.idea/modules/ss-core-poselib.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ss-core-poselib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ss-core-poselib.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ss-core-poselib.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ss-core-poselib.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sthes.ss-core-poselib.iml" filepath="$PROJECT_DIR$/.idea/modules/sthes.ss-core-poselib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sthes.ss-core-poselib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/sthes.ss-core-poselib.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sthes.ss-core-poselib.test.iml" filepath="$PROJECT_DIR$/.idea/modules/sthes.ss-core-poselib.test.iml" />
     </modules>
   </component>
 </project>

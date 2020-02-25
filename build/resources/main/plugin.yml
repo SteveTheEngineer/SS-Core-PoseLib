@@ -1,5 +1,5 @@
 name: SS-Core-PoseLib
-version: 2.0
+version: 3
 main: ru.ste.stevesseries.coreposelib.SSCorePoseLib
 api-version: "1.14"
 depend:
