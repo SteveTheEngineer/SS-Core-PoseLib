@@ -28,7 +28,7 @@ repositories {
 dependencies {
     testCompile group: "junit", name: "junit", version: "4.12"
     compileOnly "org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT"
-    compile "me.ste.stevesseries:corebase:12"
+    compile "me.ste.stevesseries:corebase:10"
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens
