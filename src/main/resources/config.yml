@@ -1,0 +1,19 @@
+messages: # All strings in the messages section are format strings
+  reload-no-permission: "&cInsufficient permissions" # The message sent to the player when they use /poselibraryreload but don't have the permission
+  configuration-reloaded: "&eThe configuration has been reloaded" # The message sent to the player when they use /poselibraryreload and the configuration has been reloaded
+  no-permission: "&cInsufficient permissions" # The message sent to the player when they use /pose but don't have the permission to do so
+  no-permission-pose: "&cYou are not allowed to use the pose %s!" # The message sent to the player when they don't have permission to set the specified pose. The arguments are: the pose name (string)
+  no-permission-others: "&cYou are not allowed to set other players' poses!" # The message sent to the player when they specify the player argument, but don't have the stevesseries.poselibrary.command.others permission.
+  available-poses: "&eUsage: /pose [pose] [player]\n&eAvailable poses: &6%s" # The message sent to the player when they use /pose without arguments. The arguments are: the pose list (string)
+  no-poses: "&6None" # The text used in place of the list in available-poses if no poses are available
+  poses-separator: ", " # The string the available poses are joined with in available-poses
+  pose-set: "&eYour pose has been set to &6%s" # The message sent to the player when their pose has been set. The arguments are: the pose name (string)
+  pose-set-other: "&eYou've set &6%s&e's pose to &6%s" # The message sent to the player when they set other player's pose. The arguments are: the player name (string), the pose name (string)
+  invalid-pose: "&cInvalid pose: %s" # The message when the pose specified in the /pose command does not exist. The arguments are: the pose name (string)
+  invalid-player: "&cInvalid player: %s" # The message when the player is not online. The arguments are: the player name (string)
+  player-only: "&cYou must specify the target player. Only players can set their own poses" # The message when a non-player used the /pose command without the target player argument. The arguments are: the pose name (string)
+  pose-not-registered: "&cThe pose %s is not registered. Please contact a server administrator for them to solve this issue!" # The message when the pose is defined in the poses section, but not provided by a plugin. The arguments are: the pose name (string)
+poses: # The poses that can be used with the /pose command
+  ss-poselibrary:standing: # The namespaced key of the pose is usually provided on the page of the plugin, whose pose you're trying to use
+    name: standing # The name of the pose in the /pose command. The permission to use this pose will be stevesseries.poselibrary.command.pose.standing
+    messages: {} # The overrides for the base messages, The syntax and the keys is the same as in the messages configuration section. The allowed keys are: no-permission, no-permission-pose, no-permission-others, pose-set and pose-set-other and player-only

@@ -1,10 +1,26 @@
-name: SS-Core-PoseLib
+name: SS-PoseLibrary
 version: @version@
-main: ru.ste.stevesseries.coreposelib.SSCorePoseLib
-api-version: "1.14"
-depend:
-  - SS-Core-Base
-prefix: "SS | Core: PoseLib"
-load: STARTUP
-authors: [STEngineer, MrIvanPlays]
-description: This plugin is providing utilities for setting player pose (lying, upside-down, sitting, etc.) that are compatible between plugins. Needed for some Steve's Series plugins
+main: me.ste.stevesseries.poselibrary.PoseLibrary
+api-version: 1.16
+depend: [SS-Base]
+authors: [SteveTheEngineer, MrIvanPlays]
+description: A library that lets you manage and create custom player poses
+
+commands:
+  pose:
+    usage: /pose [pose] [player]
+    description: This command lets you set poses manually
+  poselibraryreload:
+    usage: /poselibraryreload
+    description: Reload the plugin configuration
+
+permissions:
+  stevesseries.poselibrary.reload:
+    description: The permission to use the /poselibraryreload command
+    default: op
+  stevesseries.poselibrary.command:
+    description: The permission to use the /pose command
+    default: true
+  stevesseries.poselibrary.command.others:
+    description: The permission to use the /pose command to set other players' poses
+    default: op
