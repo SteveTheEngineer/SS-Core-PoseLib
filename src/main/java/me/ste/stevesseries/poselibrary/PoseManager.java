@@ -27,11 +27,11 @@ public class PoseManager {
         }
         Pose pose2 = event.getTo();
         if(PoseManager.POSES.containsKey(player.getUniqueId())) {
-            PoseManager.POSES.get(player.getUniqueId()).destroy();
+            PoseManager.POSES.get(player.getUniqueId()).onDestruction();
         }
         if(pose != null) {
             PoseManager.POSES.put(player.getUniqueId(), pose2);
-            pose2.init();
+            pose2.onCreation();
         } else {
             PoseManager.POSES.remove(player.getUniqueId());
         }

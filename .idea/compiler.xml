@@ -6,6 +6,12 @@
       <module name="ru.ste.stevesseries.ss-core-poselib.test" target="1.8" />
       <module name="ss-core-poselib.main" target="1.8" />
       <module name="ss-core-poselib.test" target="1.8" />
+      <module name="SS-PoseLibrary" target="1.8" />
+      <module name="SS-PoseLibrary.main" target="1.8" />
+      <module name="SS-PoseLibrary.ss-core-poselib" target="1.8" />
+      <module name="SS-PoseLibrary.ss-core-poselib.main" target="1.8" />
+      <module name="SS-PoseLibrary.ss-core-poselib.test" target="1.8" />
+      <module name="SS-PoseLibrary.test" target="1.8" />
       <module name="sthes.ss-core-poselib.main" target="1.8" />
       <module name="sthes.ss-core-poselib.test" target="1.8" />
     </bytecodeTargetLevel>

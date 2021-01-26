@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SS-Core-PoseLib.iml" filepath="$PROJECT_DIR$/SS-Core-PoseLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SS-PoseLibrary.iml" filepath="$PROJECT_DIR$/.idea/modules/SS-PoseLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SS-PoseLibrary.main.iml" filepath="$PROJECT_DIR$/.idea/modules/SS-PoseLibrary.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SS-PoseLibrary.test.iml" filepath="$PROJECT_DIR$/.idea/modules/SS-PoseLibrary.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ru.ste.stevesseries.ss-core-poselib.iml" filepath="$PROJECT_DIR$/.idea/modules/ru.ste.stevesseries.ss-core-poselib.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ru.ste.stevesseries.ss-core-poselib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ru.ste.stevesseries.ss-core-poselib.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ru.ste.stevesseries.ss-core-poselib.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ru.ste.stevesseries.ss-core-poselib.test.iml" />
